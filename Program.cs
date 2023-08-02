@@ -33,6 +33,7 @@ if (app.Environment.IsDevelopment())
     app.UseCors("DevCors");
     app.UseSwagger();
     app.UseSwaggerUI();
+
 }
 else
 {
