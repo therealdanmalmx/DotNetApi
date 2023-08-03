@@ -1,3 +1,6 @@
+using DotNetApi.Data;
+using DotNetApi.Dtos;
+using DotNetApi.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DotNetApi.Controllers;
@@ -10,26 +13,6 @@ public class UserController : ControllerBase
     public UserController(IConfiguration configuration)
     {
         _dataContextDapper = new DataContextDapper(configuration);
-    }
-
-    [HttpGet("TestConnection")]
-    public DateTime TestConnection()
-    {
-        return _dataContextDapper.LoadDataSingle<DateTime>("SELECT GETDATE()");
-    }
-
-    [HttpGet("GetUsers/{testValue}")]
-    // public IEnumerable<User> GetUsers()
-    public string[] GetUsers(string testValue)
-    {
-        return new string[] { "user1", "user2", testValue };
-        // return Enumerable.Range(1, 5).Select(index => new WeatherForecast
-        // {
-        //     Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-        //     TemperatureC = Random.Shared.Next(-20, 55),
-        //     Summary = Summaries[Random.Shared.Next(Summaries.Length)]
-        // })
-        // .ToArray();
     }
 
     [HttpGet("GetUsers")]
@@ -71,7 +54,7 @@ public class UserController : ControllerBase
     }
 
     [HttpPost("AddUser")]
-    public IActionResult AddUser(User user)
+    public IActionResult AddUser(UserToAddDto user)
     {
 
         string sql = @"
@@ -117,6 +100,24 @@ public class UserController : ControllerBase
             }
 
             throw new Exception("Failed to update user");
+
+    }
+
+    [HttpDelete("DeleteUser/{userId}")]
+    public IActionResult DeleteUser(int userId)
+    {
+        string sql = @"
+            DELETE FROM TutorialAppSchema.Users
+                WHERE UserId = " + userId.ToString();
+
+        Console.WriteLine(sql);
+
+            if (_dataContextDapper.ExecuteSql(sql))
+            {
+                return Ok();
+            }
+
+            throw new Exception("Failed to delete user");
 
     }
 
